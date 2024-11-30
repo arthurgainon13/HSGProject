@@ -1,5 +1,5 @@
 import tkinter as tk
-import Configuration  # Import the configuration module
+import subcode.Configuration  # Import the configuration module
 from tkinter import ttk
 from tkinter import messagebox
 import yfinance as yf
@@ -50,10 +50,10 @@ class BacktestApp(tk.Tk):
 
         # Dropdown list of top companies (Using Configuration File)
         self.company_var = tk.StringVar()
-        self.company_var.set(next(iter(Configuration.COMPANIES.keys())))  # Default to the first company in the list
-        self.ticker_map = Configuration.COMPANIES  # Mapping for later use
+        self.company_var.set(next(iter(subcode.Configuration.COMPANIES.keys())))  # Default to the first company in the list
+        self.ticker_map = subcode.Configuration.COMPANIES  # Mapping for later use
         self.company_dropdown = ttk.OptionMenu(
-            self.input_frame, self.company_var, self.company_var.get(), *Configuration.COMPANIES.keys())
+            self.input_frame, self.company_var, self.company_var.get(), *subcode.Configuration.COMPANIES.keys())
         self.company_dropdown.config(width=25)
         self.company_dropdown.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
 
@@ -113,8 +113,8 @@ class BacktestApp(tk.Tk):
             return
 
         # Use the configuration values for start and end dates
-        start_date = Configuration.START_DATE
-        end_date = Configuration.END_DATE
+        start_date = subcode.Configuration.START_DATE
+        end_date = subcode.Configuration.END_DATE
         data = get_historical_data(ticker, start_date, end_date)
         if data.empty:
             messagebox.showinfo("No Data", "No data available for the selected parameters.")
