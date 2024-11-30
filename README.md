@@ -49,3 +49,7 @@ python3 main.py
 ## Dependencies
 See `requirements.txt` for a list of required libraries.
 
+## Students
+- Leo Marti
+- Samuel Walliser
+- Arthur Gainon
