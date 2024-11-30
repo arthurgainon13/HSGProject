@@ -11,11 +11,11 @@ A Python application for backtesting trading strategies using the RSI indicator.
 - Backtest strategies and visualize results.
 
 ## Installation
-1. Clone this repository:
+Install dependencies:
    ```bash
-   git clone https://github.com/USERNAME/RSI_Backtesting_Tool.git
+   pip install -r requirements.txt
    ```
-2. Install dependencies:
+or
    ```bash
    pip install -r requirements.txt
    ```
@@ -24,6 +24,10 @@ A Python application for backtesting trading strategies using the RSI indicator.
 Run the application:
 ```bash
 python main.py
+```
+or
+```bash
+python3 main.py
 ```
 
 ## Dependencies
