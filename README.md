@@ -35,6 +35,8 @@ or if it doesn't work, try:
 python3 main.py
 ```
 
+Then when the Interface is opened, select the data you want to add and run the backtest.
+
 ## Dependencies
 See `requirements.txt` for a list of required libraries.
 
