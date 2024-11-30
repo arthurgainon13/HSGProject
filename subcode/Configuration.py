@@ -1,4 +1,5 @@
-# Configuration.py
+# In this file, you can choose and modify the configuration of the code.
+# You can adapat your analysed companies as well as Dates of analysis
 
 # List of top companies and their tickers
 COMPANIES = {
