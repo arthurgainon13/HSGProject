@@ -1,4 +1,5 @@
 import tkinter as tk
+import Configuration  # Import the configuration module
 from tkinter import ttk
 from tkinter import messagebox
 import yfinance as yf
@@ -47,23 +48,12 @@ class BacktestApp(tk.Tk):
         self.company_label = ttk.Label(self.input_frame, text="Select Company:", font=input_font)
         self.company_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
 
-        # Dropdown list of top companies (Removed Berkshire Hathaway)
+        # Dropdown list of top companies (Using Configuration File)
         self.company_var = tk.StringVar()
-        self.company_var.set('Apple Inc. (AAPL)')  # Default value
-        companies = {
-            'Apple Inc. (AAPL)': 'AAPL',
-            'Microsoft Corporation (MSFT)': 'MSFT',
-            'Amazon.com, Inc. (AMZN)': 'AMZN',
-            'Alphabet Inc. Class A (GOOGL)': 'GOOGL',
-            'Alphabet Inc. Class C (GOOG)': 'GOOG',
-            'Meta Platforms, Inc. (META)': 'META',  # Formerly Facebook (FB)
-            'Tesla, Inc. (TSLA)': 'TSLA',
-            'NVIDIA Corporation (NVDA)': 'NVDA',
-            'JPMorgan Chase & Co. (JPM)': 'JPM'
-        }
-        self.ticker_map = companies  # Mapping for later use
+        self.company_var.set(next(iter(Configuration.COMPANIES.keys())))  # Default to the first company in the list
+        self.ticker_map = Configuration.COMPANIES  # Mapping for later use
         self.company_dropdown = ttk.OptionMenu(
-            self.input_frame, self.company_var, self.company_var.get(), *companies.keys())
+            self.input_frame, self.company_var, self.company_var.get(), *Configuration.COMPANIES.keys())
         self.company_dropdown.config(width=25)
         self.company_dropdown.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
 
@@ -122,9 +112,9 @@ class BacktestApp(tk.Tk):
             messagebox.showerror("Input Error", str(e))
             return
 
-        # Fetch and process data
-        start_date = '2020-01-01'
-        end_date = '2023-12-31'
+        # Use the configuration values for start and end dates
+        start_date = Configuration.START_DATE
+        end_date = Configuration.END_DATE
         data = get_historical_data(ticker, start_date, end_date)
         if data.empty:
             messagebox.showinfo("No Data", "No data available for the selected parameters.")
