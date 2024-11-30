@@ -38,10 +38,10 @@ python3 main.py
 ### Then when the Interface is opened:
 1. Select a company from the dropdown menu.
 2. Enter the desired parameters:
--   Starting Capital: Initial amount of money for trading.
--   Fee per Trade: Percentage fee charged for each transaction.
--   RSI Overbought Level: RSI value above which the stock is considered overbought (default: 70).
--   RSI Oversold Level: RSI value below which the stock is considered oversold (default: 30).
+   -   Starting Capital: Initial amount of money for trading.
+   -   Fee per Trade: Percentage fee charged for each transaction.
+   -   RSI Overbought Level: RSI value above which the stock is considered overbought (default: 70).
+   -   RSI Oversold Level: RSI value below which the stock is considered oversold (default: 30).
 3. Click the "Run Backtest" button to start the simulation.
 4. Review the performance metrics and visualizations in the results section.
 
