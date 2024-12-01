@@ -93,10 +93,18 @@ class BacktestApp(tk.Tk):
         self.oversold_entry.insert(0, "30")  # Default value: 30
         self.oversold_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
 
- # Button to run the backtest
+        # Button to run the backtest
         self.run_button = ttk.Button(self.input_frame, text="Run Backtest", command=self.run_backtest)
         self.run_button.grid(row=5, column=0, columnspan=2, pady=10)  # Spans both columns
 
+        # Button to exit the application
+        self.exit_button = ttk.Button(self.input_frame, text="Exit", command=self.exit_application)
+        self.exit_button.grid(row=6, column=0, columnspan=2, pady=10) 
+
+    def exit_application(self):
+        self.quit()  # Gracefully close the application
+        self.destroy()  # Destroy all widgets and exit
+    
     def run_backtest(self):
         # Validate user inputs
         try:
