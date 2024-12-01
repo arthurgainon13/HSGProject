@@ -110,7 +110,11 @@ class BacktestApp(tk.Tk):
         try:
             # Retrieve selected company name and corresponding ticker symbol
             company_name = self.company_var.get()
-            ticker = self.ticker_map[company_name]
+            ticker = self.ticker_map.get(company_name, None)
+            print(f"Selected company: {company_name}, Ticker: {ticker}")
+            if not ticker:
+                raise ValueError(f"Ticker not found for selected company: {company_name}")
+
 
             # Get and validate the initial capital (must be a positive number)
             initial_capital = float(self.capital_entry.get())
