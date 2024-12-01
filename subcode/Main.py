@@ -1,11 +1,5 @@
-# Import necessary libraries and modules for the application:
-# - tkinter for GUI elements
-# - yfinance for financial data retrieval
-# - pandas and numpy for data manipulation
-# - matplotlib for data visualization
-# - subcode.Configuration for custom configurations
 import tkinter as tk
-import subcode.Configuration
+import subcode.Configuration  # Import the configuration module
 from tkinter import ttk
 from tkinter import messagebox
 import yfinance as yf
@@ -14,204 +8,141 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Main Application Class for the RSI Backtesting Tool
+# Main Application Class
 class BacktestApp(tk.Tk):
     def __init__(self):
-        # Initialize the tkinter parent class
         super().__init__()
-        
-        # Set the window title
         self.title("RSI Backtesting Tool")
-        
-        # Define the window dimensions, in this case 1200x900
         self.geometry("1200x900")
-        
-        # Call the method to create widgets for the application
         self.create_widgets()
-        
-        # Initialize placeholders for widgets that will be updated dynamically
-        self.canvas = None  # Placeholder for graphical canvas (e.g., plot area)
-        self.metrics_frame = None  # Placeholder for a frame displaying backtest metrics
+        # Initialize placeholders for dynamic widgets
+        self.canvas = None
+        self.metrics_frame = None
 
     def create_widgets(self):
-        # Create and configure the main frame that holds all subcomponents
+        # Main Frame
         self.main_frame = tk.Frame(self)
-        self.main_frame.pack(fill=tk.BOTH, expand=True)  # Fill both dimensions and allow resizing
-        
-        # Input Frame (for user input, located at the top left)
-        self.input_frame = tk.Frame(self.main_frame)
-        self.input_frame.grid(row=0, column=0, sticky='nw', padx=10, pady=10)  # Padding for spacing
+        self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Summary Frame (for displaying summary metrics, located at the top right)
+        # Input Frame (Top Left)
+        self.input_frame = tk.Frame(self.main_frame)
+        self.input_frame.grid(row=0, column=0, sticky='nw', padx=10, pady=10)
+
+        # Summary Frame (Top Right)
         self.summary_frame = tk.Frame(self.main_frame)
         self.summary_frame.grid(row=0, column=1, sticky='ne', padx=10, pady=10)
 
-        # Results Frame (for displaying graphical results, spans the bottom of the window)
+        # Results Frame (Bottom, spans both columns)
         self.results_frame = tk.Frame(self.main_frame)
-        self.results_frame.grid(row=1, column=0, columnspan=2, sticky='nsew') # Parametres for the Widget
+        self.results_frame.grid(row=1, column=0, columnspan=2, sticky='nsew')
 
-        # Configure row and column weights for proper resizing behavior
-        self.main_frame.rowconfigure(1, weight=1)  # Results frame grows vertically
-        self.main_frame.columnconfigure(0, weight=1)  # Input/summary frames grow horizontally
+        # Configure row and column weights
+        self.main_frame.rowconfigure(1, weight=1)
+        self.main_frame.columnconfigure(0, weight=1)
         self.main_frame.columnconfigure(1, weight=1)
 
-        # Define a consistent font for input widgets , in this case Helevetica 8 
+        # Font for labels and entries (8pt)
         input_font = ("Helvetica", 8)
 
-        # Input Widgets for user parameters
-
-        # Label and dropdown for selecting a company
+        # Input Widgets
         self.company_label = ttk.Label(self.input_frame, text="Select Company:", font=input_font)
-        self.company_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W) # Parametres for the Widget
+        self.company_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
 
-        # Dropdown list for companies, sourced from the configuration file
+        # Dropdown list of top companies (Using Configuration File)
         self.company_var = tk.StringVar()
-        self.company_var.set(next(iter(subcode.Configuration.COMPANIES.keys())))  # Default to the first company
-        self.ticker_map = subcode.Configuration.COMPANIES  # Map for ticker lookups
+        self.company_var.set(next(iter(subcode.Configuration.COMPANIES.keys())))  # Default to the first company in the list
+        self.ticker_map = subcode.Configuration.COMPANIES  # Mapping for later use
         self.company_dropdown = ttk.OptionMenu(
             self.input_frame, self.company_var, self.company_var.get(), *subcode.Configuration.COMPANIES.keys())
-        self.company_dropdown.config(width=25)  # Set dropdown width
-        self.company_dropdown.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W) # Parametres for the Widget
+        self.company_dropdown.config(width=25)
+        self.company_dropdown.grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
 
-        # Entry for starting capital
+        # Starting Capital
         self.capital_label = ttk.Label(self.input_frame, text="Starting Capital ($):", font=input_font)
         self.capital_label.grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
         self.capital_entry = ttk.Entry(self.input_frame, font=input_font)
-        self.capital_entry.insert(0, "10000")  # Set default value: $10,000
-        self.capital_entry.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W) # Parametres for the Widget
+        self.capital_entry.insert(0, "10000")
+        self.capital_entry.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
-        # Entry for trading fee percentage
+        # Fee per Trade (%)
         self.fee_label = ttk.Label(self.input_frame, text="Fee per Trade (%):", font=input_font)
         self.fee_label.grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
         self.fee_entry = ttk.Entry(self.input_frame, font=input_font)
-        self.fee_entry.insert(0, "0.1")  # Set default value: 0.1% fee
-        self.fee_entry.grid(row=2, column=1, padx=5, pady=5, sticky=tk.W) # Parametres for the Widget
+        self.fee_entry.insert(0, "0.1")  # Default fee is 0.1%
+        self.fee_entry.grid(row=2, column=1, padx=5, pady=5, sticky=tk.W)
 
-        # Entry for RSI overbought level
+        # RSI Overbought Level
         self.overbought_label = ttk.Label(self.input_frame, text="RSI Overbought Level:", font=input_font)
         self.overbought_label.grid(row=3, column=0, padx=5, pady=5, sticky=tk.W)
         self.overbought_entry = ttk.Entry(self.input_frame, font=input_font)
-        self.overbought_entry.insert(0, "70")  # Set default value: 70
-        self.overbought_entry.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W) # Parametres for the Widget
+        self.overbought_entry.insert(0, "70")
+        self.overbought_entry.grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
 
-        # Entry for RSI oversold level
+        # RSI Oversold Level
         self.oversold_label = ttk.Label(self.input_frame, text="RSI Oversold Level:", font=input_font)
         self.oversold_label.grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
         self.oversold_entry = ttk.Entry(self.input_frame, font=input_font)
-        self.oversold_entry.insert(0, "30")  # Set default value: 30
-        self.oversold_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W) # Parametres for the Widget
+        self.oversold_entry.insert(0, "30")
+        self.oversold_entry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
 
-        # Button to run the backtest
+        # Run Button
         self.run_button = ttk.Button(self.input_frame, text="Run Backtest", command=self.run_backtest)
-        self.run_button.grid(row=5, column=0, columnspan=2, pady=10)  # Spans both columns
+        self.run_button.grid(row=5, column=0, columnspan=2, pady=10)
 
     def run_backtest(self):
-    # Validez les entrées utilisateur pour les paramètres de backtest
-    try:
-        # Récupérer le nom de l'entreprise sélectionnée et son ticker correspondant
-        company_name = self.company_var.get()
-        ticker = self.ticker_map[company_name]  # Corrige l'assignation de 'ticker'
+        # Validate user inputs
+        try:
+            company_name = self.company_var.get()
+            ticker = self.ticker_map[company_name]
+            initial_capital = float(self.capital_entry.get())
+            if initial_capital <= 0:
+                raise ValueError("Starting capital must be positive.")
+            fee_percentage = float(self.fee_entry.get()) / 100  # Convert to decimal
+            if fee_percentage < 0:
+                raise ValueError("Fee percentage cannot be negative.")
+            rsi_overbought = float(self.overbought_entry.get())
+            if not (0 < rsi_overbought < 100):
+                raise ValueError("RSI Overbought level must be between 0 and 100.")
+            rsi_oversold = float(self.oversold_entry.get())
+            if not (0 < rsi_oversold < 100):
+                raise ValueError("RSI Oversold level must be between 0 and 100.")
+            if rsi_oversold >= rsi_overbought:
+                raise ValueError("RSI Oversold level must be less than RSI Overbought level.")
+        except ValueError as e:
+            messagebox.showerror("Input Error", str(e))
+            return
 
-        # Valider le capital initial (doit être un nombre positif)
-        initial_capital = float(self.capital_entry.get())
-        if initial_capital <= 0:
-            raise ValueError("Starting capital must be positive.")
-
-        # Valider le pourcentage de frais (doit être non négatif)
-        fee_percentage = float(self.fee_entry.get()) / 100  # Convertir de pourcentage à décimal
-        if fee_percentage < 0:
-            raise ValueError("Fee percentage cannot be negative.")
-
-        # Valider le niveau RSI suracheté (doit être entre 0 et 100)
-        rsi_overbought = float(self.overbought_entry.get())
-        if not (0 < rsi_overbought < 100):
-            raise ValueError("RSI Overbought level must be between 0 and 100.")
-
-        # Valider le niveau RSI survendu (doit être entre 0 et 100)
-        rsi_oversold = float(self.oversold_entry.get())
-        if not (0 < rsi_oversold < 100):
-            raise ValueError("RSI Oversold level must be between 0 and 100.")
-
-        # Vérifier que RSI survendu < RSI suracheté
-        if rsi_oversold >= rsi_overbought:
-            raise ValueError("RSI Oversold level must be less than RSI Overbought level.")
-
-        # Récupérer les données historiques pour le ticker sélectionné
+        # Use the configuration values for start and end dates
         start_date = subcode.Configuration.START_DATE
         end_date = subcode.Configuration.END_DATE
         data = get_historical_data(ticker, start_date, end_date)
-
-        # Vérifier si des données ont été retournées
         if data.empty:
             messagebox.showinfo("No Data", "No data available for the selected parameters.")
             return
-
-        # Calculer RSI, générer des signaux et exécuter la stratégie de backtesting
         data = calculate_rsi(data)
         data = generate_signals(data, rsi_overbought, rsi_oversold)
         data = backtest_strategy(data, initial_capital, fee_percentage)
 
-        # Calculer les métriques de performance
+        # Calculate performance metrics and update data with Buy and Hold values
         data, metrics = calculate_performance_metrics(data, initial_capital)
 
-        # Afficher les métriques calculées
+        # Display performance metrics
         self.display_metrics(metrics)
 
-        # Générer et afficher les graphiques
+        # Plot results
         self.plot_results(data, company_name, rsi_overbought, rsi_oversold)
 
-    except Exception as e:
-        # Afficher une boîte de dialogue pour les erreurs inattendues
-        messagebox.showerror("Backtest Error", str(e))
-
-
-
-    def run_backtest(self):
-        # Retrieve and validate user inputs
-        try:
-            # Extract configuration values for the date range - Those value are in the Configuration file
-            start_date = subcode.Configuration.START_DATE
-            end_date = subcode.Configuration.END_DATE
-
-            # Fetch historical data for the selected ticker
-            data = get_historical_data(ticker, start_date, end_date)
-
-            # Handle cases where no data is available
-            if data.empty:
-                messagebox.showinfo("No Data", "No data available for the selected parameters.")
-                return
-
-            # Calculate RSI, generate signals, and execute the backtesting strategy
-            data = calculate_rsi(data)
-            data = generate_signals(data, rsi_overbought, rsi_oversold)
-            data = backtest_strategy(data, initial_capital, fee_percentage)
-
-            # Calculate performance metrics and update data with Buy and Hold values
-            data, metrics = calculate_performance_metrics(data, initial_capital)
-
-            # Display calculated metrics in the GUI
-            self.display_metrics(metrics)
-
-            # Plot the results (price, RSI, portfolio values)
-            self.plot_results(data, company_name, rsi_overbought, rsi_oversold)
-
-        except Exception as e:
-            # Show an error message for unexpected issues
-            messagebox.showerror("Backtest Error", str(e))
-
     def display_metrics(self, metrics):
-        # Clear any previous metrics displayed
+        # Clear previous metrics if any
         if self.metrics_frame:
             self.metrics_frame.destroy()
 
-        # Create a new frame for the metrics table
         self.metrics_frame = tk.Frame(self.summary_frame)
         self.metrics_frame.pack(anchor='ne')
 
-        # Define font style for table labels
         label_font = ("Helvetica", 8)
 
-        # Define table headers and metric labels
+        # Create a table with 7 rows and 3 columns
         headers = ["", "RSI-Strategy", "Buy-n-Hold"]
         metrics_labels = [
             "Portfolio Value",
@@ -223,49 +154,54 @@ class BacktestApp(tk.Tk):
             "Number of Trades"
         ]
 
-        # Create the table header row
+        # Create header row
         for col, header in enumerate(headers):
             header_label = tk.Label(self.metrics_frame, text=header, font=("Helvetica", 8, "bold"))
             header_label.grid(row=0, column=col, padx=5, pady=2)
 
-        # Populate the table rows with metrics
+        # Fill in the metrics
         for row, metric in enumerate(metrics_labels, start=1):
             # Metric name
             metric_label = tk.Label(self.metrics_frame, text=metric + ":", font=label_font)
             metric_label.grid(row=row, column=0, sticky='w', padx=5, pady=2)
 
-            # Fetch RSI-Strategy value from the metrics dictionary
+            # Generate the key for metrics dictionary
             key = metric.lower().replace(" ", "_").replace(".", "")
+
+            # RSI-Strategy value
             rsi_value = metrics.get(key, "")
             rsi_label = tk.Label(self.metrics_frame, text=rsi_value, font=label_font)
             rsi_label.grid(row=row, column=1, sticky='e', padx=5, pady=2)
 
-            # Fetch Buy-n-Hold value from the metrics dictionary
+            # Buy-n-Hold value
             bh_value = metrics.get("bh_" + key, "")
             bh_label = tk.Label(self.metrics_frame, text=bh_value, font=label_font)
             bh_label.grid(row=row, column=2, sticky='e', padx=5, pady=2)
 
     def plot_results(self, data, company_name, rsi_overbought, rsi_oversold):
-        # Clear any previous plots
+        # Clear previous plots if any
         if self.canvas:
             self.canvas.get_tk_widget().destroy()
 
-        # Create subplots for stock price, RSI, and portfolio value
+        # Create the figure and axes
         fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
 
-        # Plot stock price and buy/sell signals
+        # Plot Stock Price
         ax1.plot(data.index, data['Close'], label=f"{company_name} Price")
-        trades = data[data['Trades'] != 0]  # Filter rows with trades
+
+        # Plot Buy/Sell Points when trades are executed
+        trades = data[data['Trades'] != 0]
         ax1.plot(trades.loc[trades['Trades'] == 1].index,
                  trades['Close'][trades['Trades'] == 1], '^', markersize=10, color='g', label='Buy')
         ax1.plot(trades.loc[trades['Trades'] == -1].index,
                  trades['Close'][trades['Trades'] == -1], 'v', markersize=10, color='r', label='Sell')
+
         ax1.set_title(f"{company_name} Price with Buy/Sell Signals")
         ax1.set_ylabel('Price ($)')
         ax1.legend()
         ax1.grid(True, which='both', linestyle='--', linewidth=0.5)
 
-        # Plot RSI and thresholds
+        # Plot RSI
         ax2.plot(data.index, data['RSI'], label='RSI')
         ax2.axhline(y=rsi_overbought, color='r', linestyle='--', label=f'Overbought ({rsi_overbought})')
         ax2.axhline(y=rsi_oversold, color='g', linestyle='--', label=f'Oversold ({rsi_oversold})')
@@ -274,7 +210,7 @@ class BacktestApp(tk.Tk):
         ax2.legend()
         ax2.grid(True, which='both', linestyle='--', linewidth=0.5)
 
-        # Plot portfolio values for RSI strategy and Buy-n-Hold
+        # Plot Portfolio Value
         ax3.plot(data.index, data['Portfolio Value'], label='RSI-Strategy Portfolio Value')
         ax3.plot(data.index, data['Buy and Hold Portfolio Value'], label='Buy-n-Hold Portfolio Value', linestyle='--')
         ax3.set_title('Portfolio Value Over Time')
@@ -283,34 +219,40 @@ class BacktestApp(tk.Tk):
         ax3.legend()
         ax3.grid(True, which='both', linestyle='--', linewidth=0.5)
 
-        plt.tight_layout()  # Adjust layout to prevent overlap
+        # Make sure the borders of the plot are visible
+        for ax in [ax1, ax2, ax3]:
+            ax.spines['top'].set_visible(True)
+            ax.spines['right'].set_visible(True)
+            ax.spines['bottom'].set_visible(True)
+            ax.spines['left'].set_visible(True)
 
-        # Embed the matplotlib figure into the Tkinter GUI
+        plt.tight_layout()
+
+        # Embed the figure in Tkinter
         self.canvas = FigureCanvasTkAgg(fig, master=self.results_frame)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-
 # Function to fetch historical data
 def get_historical_data(ticker, start_date, end_date):
     """
-    Fetches historical price data for a given ticker using Yahoo Finance.
+    Fetches historical price data for a given ticker.
     """
     data = yf.download(tickers=ticker, start=start_date, end=end_date, interval='1d', progress=False)
-    data.dropna(inplace=True)  # Remove rows with missing values
-    if isinstance(data.columns, pd.MultiIndex):  # Handle multi-indexed data
+    data.dropna(inplace=True)
+    # Flatten MultiIndex columns if present
+    if isinstance(data.columns, pd.MultiIndex):
         data.columns = data.columns.get_level_values(0)
     return data
-
 
 # Function to calculate RSI
 def calculate_rsi(data, period=14):
     """
-    Calculates the Relative Strength Index (RSI) using a rolling average.
+    Calculates the Relative Strength Index (RSI).
     """
     delta = data['Close'].diff()
-    gain = delta.where(delta > 0, 0).fillna(0)
-    loss = -delta.where(delta < 0, 0).fillna(0)
+    gain = (delta.where(delta > 0, 0)).fillna(0)
+    loss = (-delta.where(delta < 0, 0)).fillna(0)
     avg_gain = gain.rolling(window=period, min_periods=1).mean()
     avg_loss = loss.rolling(window=period, min_periods=1).mean()
     rs = avg_gain / avg_loss
@@ -318,11 +260,10 @@ def calculate_rsi(data, period=14):
     data['RSI'] = data['RSI'].fillna(50)  # Neutral RSI for initial periods
     return data
 
-
 # Function to generate trading signals based on RSI
 def generate_signals(data, rsi_overbought, rsi_oversold):
     """
-    Generates buy and sell signals based on RSI thresholds.
+    Generates trading signals based on RSI levels.
     """
     data['Signal'] = 0
 
@@ -336,45 +277,65 @@ def generate_signals(data, rsi_overbought, rsi_oversold):
 
     return data
 
+# Function to backtest the strategy
 def backtest_strategy(data, initial_capital, fee_percentage):
     """
-    Simulates trading based on signals, accounting for fees and capital changes.
+    Backtests the trading strategy.
     """
-    # Variables to track portfolio and trades
+    data = data.copy()
     cash = initial_capital
     holdings = 0
     total_fees = 0
     portfolio_values = []
+    positions = []
     trades = []
+    daily_returns = []
+    prev_portfolio_value = initial_capital
 
-    # Simulate daily trading
     for i in range(len(data)):
         price = data['Close'].iloc[i]
+        if isinstance(price, pd.Series):
+            price = price.iloc[0]
+        price = float(price)
         signal = data['Signal'].iloc[i]
-        trade = 0  # Tracks buy (1), sell (-1), or hold (0)
-
-        if signal == 1 and holdings == 0:  # Buy condition
+        trade = 0  # 1 for buy, -1 for sell, 0 for hold
+        if signal == 1 and holdings == 0:
+            # Buy
             shares = int(cash // price)
             if shares > 0:
                 fee = shares * price * fee_percentage
                 cash -= shares * price + fee
                 holdings += shares
                 total_fees += fee
+                positions.append(1)
                 trade = 1
-        elif signal == -1 and holdings > 0:  # Sell condition
+            else:
+                positions.append(positions[-1] if positions else 0)
+        elif signal == -1 and holdings > 0:
+            # Sell
             fee = holdings * price * fee_percentage
             cash += holdings * price - fee
             holdings = 0
             total_fees += fee
+            positions.append(0)
             trade = -1
-
-        portfolio_values.append(cash + holdings * price)
+        else:
+            # Maintain current position
+            positions.append(positions[-1] if positions else 0)
+        portfolio_value = cash + holdings * price
+        portfolio_values.append(portfolio_value)
         trades.append(trade)
+        # Calculate daily return
+        daily_return = (portfolio_value - prev_portfolio_value) / prev_portfolio_value if prev_portfolio_value != 0 else 0
+        daily_returns.append(daily_return)
+        prev_portfolio_value = portfolio_value
 
     data['Portfolio Value'] = portfolio_values
-    data['Trades'] = trades
+    data['Total Fees'] = total_fees
+    data['Positions'] = positions
+    data['Trades'] = trades  # Record trades for plotting
+    data['Strategy Daily Return'] = daily_returns
     return data
-
 
 # Function to calculate performance metrics
 def calculate_performance_metrics(data, initial_capital):
