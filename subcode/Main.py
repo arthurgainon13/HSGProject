@@ -106,40 +106,64 @@ class BacktestApp(tk.Tk):
         self.run_button.grid(row=5, column=0, columnspan=2, pady=10)  # Spans both columns
 
     def run_backtest(self):
-        # Validate user inputs for backtesting parameters
-        try:
-            # Retrieve selected company name and corresponding ticker symbol
-            company_name = self.company_var.get()
-            ticker = self.ticker_map[company_name]
+    # Validez les entrées utilisateur pour les paramètres de backtest
+    try:
+        # Récupérer le nom de l'entreprise sélectionnée et son ticker correspondant
+        company_name = self.company_var.get()
+        ticker = self.ticker_map[company_name]  # Corrige l'assignation de 'ticker'
 
-            # Get and validate the initial capital (must be a positive number)
-            initial_capital = float(self.capital_entry.get())
-            if initial_capital <= 0:
-                raise ValueError("Starting capital must be positive.") # Tells that the Starting capital must be positive
+        # Valider le capital initial (doit être un nombre positif)
+        initial_capital = float(self.capital_entry.get())
+        if initial_capital <= 0:
+            raise ValueError("Starting capital must be positive.")
 
-            # Get and validate the fee percentage (must not be negative)
-            fee_percentage = float(self.fee_entry.get()) / 100  # Convert from percentage to decimal
-            if fee_percentage < 0:
-                raise ValueError("Fee percentage cannot be negative.") # Tells that the percentage must be positive
+        # Valider le pourcentage de frais (doit être non négatif)
+        fee_percentage = float(self.fee_entry.get()) / 100  # Convertir de pourcentage à décimal
+        if fee_percentage < 0:
+            raise ValueError("Fee percentage cannot be negative.")
 
-            # Get and validate the RSI overbought level (must be between 0 and 100)
-            rsi_overbought = float(self.overbought_entry.get())
-            if not (0 < rsi_overbought < 100):
-                raise ValueError("RSI Overbought level must be between 0 and 100.") # Tells that the RSI threshold must be between 0 and 100
+        # Valider le niveau RSI suracheté (doit être entre 0 et 100)
+        rsi_overbought = float(self.overbought_entry.get())
+        if not (0 < rsi_overbought < 100):
+            raise ValueError("RSI Overbought level must be between 0 and 100.")
 
-            # Get and validate the RSI oversold level (must be between 0 and 100)
-            rsi_oversold = float(self.oversold_entry.get())
-            if not (0 < rsi_oversold < 100):
-                raise ValueError("RSI Oversold level must be between 0 and 100.") # Tells that the RSI threshold must be between 0 and 100
+        # Valider le niveau RSI survendu (doit être entre 0 et 100)
+        rsi_oversold = float(self.oversold_entry.get())
+        if not (0 < rsi_oversold < 100):
+            raise ValueError("RSI Oversold level must be between 0 and 100.")
 
-            # Ensure RSI oversold level is less than RSI overbought level
-            if rsi_oversold >= rsi_overbought:
-                raise ValueError("RSI Oversold level must be less than RSI Overbought level.") # Tells that RSI threshold Oversold is higher than Overbought
+        # Vérifier que RSI survendu < RSI suracheté
+        if rsi_oversold >= rsi_overbought:
+            raise ValueError("RSI Oversold level must be less than RSI Overbought level.")
 
-        except ValueError as e:
-            # Show an error message dialog if validation fails
-            messagebox.showerror("Input Error", str(e))
+        # Récupérer les données historiques pour le ticker sélectionné
+        start_date = subcode.Configuration.START_DATE
+        end_date = subcode.Configuration.END_DATE
+        data = get_historical_data(ticker, start_date, end_date)
+
+        # Vérifier si des données ont été retournées
+        if data.empty:
+            messagebox.showinfo("No Data", "No data available for the selected parameters.")
             return
+
+        # Calculer RSI, générer des signaux et exécuter la stratégie de backtesting
+        data = calculate_rsi(data)
+        data = generate_signals(data, rsi_overbought, rsi_oversold)
+        data = backtest_strategy(data, initial_capital, fee_percentage)
+
+        # Calculer les métriques de performance
+        data, metrics = calculate_performance_metrics(data, initial_capital)
+
+        # Afficher les métriques calculées
+        self.display_metrics(metrics)
+
+        # Générer et afficher les graphiques
+        self.plot_results(data, company_name, rsi_overbought, rsi_oversold)
+
+    except Exception as e:
+        # Afficher une boîte de dialogue pour les erreurs inattendues
+        messagebox.showerror("Backtest Error", str(e))
+
 
 
     def run_backtest(self):
