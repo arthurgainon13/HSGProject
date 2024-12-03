@@ -11,7 +11,7 @@
 #             ChatGPT, an AI language model by OpenAI.
 
 
-from subcode.Main import BacktestApp
+from subcode.Preparation import BacktestApp  # Import BacktestApp from Preparation
 
 if __name__ == '__main__':
     app = BacktestApp()
