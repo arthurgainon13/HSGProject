@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import subcode.Configuration  # Ensure Configuration module is imported correctly
+import subcode.Configuration  # Correctement référencé
 from subcode.App import calculate_rsi, generate_signals, backtest_strategy, calculate_performance_metrics, get_historical_data
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 # Main Application Class
 class BacktestApp(tk.Tk):
