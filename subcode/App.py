@@ -305,7 +305,7 @@ def backtest_strategy(data, initial_capital, fee_percentage):
         
         # Calculate daily return
         daily_return = (portfolio_value - prev_portfolio_value) / prev_portfolio_value if prev_portfolio_value != 0 else 0
-        daily_returns.append(daily_return
+        daily_returns.append(daily_return)
 
         # Update the previous portfolio value for the next iteration
         prev_portfolio_value = portfolio_value
