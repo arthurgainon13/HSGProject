@@ -1,3 +1,14 @@
+import tkinter as tk
+import subcode.Configuration  # Import the configuration module
+import subcode.Preparation # Import the Preparation module
+from tkinter import ttk
+from tkinter import messagebox
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 # Main Application Class
 class BacktestApp(tk.Tk):
     def __init__(self):
