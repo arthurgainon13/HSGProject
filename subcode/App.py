@@ -4,16 +4,11 @@
 # - pandas and numpy for data manipulation
 # - matplotlib for data visualization
 # - subcode.Configuration for custom configurations
-import tkinter as tk
-import subcode.Configuration  # Import the configuration module
-import subcode.Preparation # Import the Preparation module
-from tkinter import ttk
-from tkinter import messagebox
-import yfinance as yf
+import subcode.Configuration  # Reference configuration
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import yfinance as yf
+
     
     def run_backtest(self):
         # Validate user inputs
