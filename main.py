@@ -10,11 +10,9 @@
 # Assistance: This structure and modularization were inspired by
 #             ChatGPT, an AI language model by OpenAI.
 
-
-from subcode.Preparation import BacktestApp  # Import BacktestApp from Preparation
+from subcode.App import BacktestApp
 
 if __name__ == '__main__':
     app = BacktestApp()
     app.mainloop()
-
 
