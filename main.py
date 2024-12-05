@@ -7,6 +7,7 @@
 #              an instance of the `BacktestApp` class from `app_ui.py`.
 # Assistance: This structure and modularization were inspired by
 #             ChatGPT, an AI language model by OpenAI.
+# ---------------------------------------------------------
 
 from subcode.App import BacktestApp
 
