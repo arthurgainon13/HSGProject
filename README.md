@@ -50,6 +50,7 @@ python3 main.py
 See `requirements.txt` for a list of required libraries.
 
 ## Students
+Group id : 3360
 - Leo Marti
 - Samuel Walliser
 - Arthur Gainon
