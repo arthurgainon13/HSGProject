@@ -2,15 +2,12 @@
 # RSI Backtesting Tool
 #
 # Language: Python
-# Description: This is the entry point of the RSI Backtesting Tool. It
-#              initializes and launches the application by creating
-#              an instance of the `BacktestApp` class from `app_ui.py`.
+# Description: This is the configuration part of the code. 
+# There you can adapat your analysed companies as well as Dates of analysis
 # Assistance: This structure and modularization were inspired by
 #             ChatGPT, an AI language model by OpenAI.
 # ---------------------------------------------------------
 
-# In this file, you can choose and modify the configuration of the code.
-# You can adapat your analysed companies as well as Dates of analysis
 
 # List of top companies and their tickers
 COMPANIES = {
