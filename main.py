@@ -1,9 +1,7 @@
 # ---------------------------------------------------------
-# RSI Backtesting Tool - Main Application
+# RSI Backtesting Tool
 #
 # Language: Python
-# Author: Samuel
-# Date Created: November 28, 2024
 # Description: This is the entry point of the RSI Backtesting Tool. It
 #              initializes and launches the application by creating
 #              an instance of the `BacktestApp` class from `app_ui.py`.
